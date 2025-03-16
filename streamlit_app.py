@@ -93,6 +93,7 @@ def main():
         
         st.subheader("Описательная статистика")
         st.write(city_data.describe())
+        
         st.subheader("Временной ряд температуры с аномалиями")
         plot_time_series(city_data, selected_city)
         
