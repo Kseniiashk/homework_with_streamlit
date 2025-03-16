@@ -131,6 +131,13 @@ def create_pdf_report(city, data, current_temp, api_key):
     pdf.output(f"{city}_temperature_report.pdf")
     return f"{city}_temperature_report.pdf"
 
+def get_binary_file_downloader_html(file_path, label="Скачать отчет"):
+    with open(file_path, "rb") as f:
+        data = f.read()
+    bin_str = base64.b64encode(data).decode()
+    href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{file_path}">{label}</a>'
+    return href
+    
 def main():
     st.title("Анализ температурных данных и мониторинг текущей температуры")
     
