@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import requests
 from datetime import datetime
 from sklearn.linear_model import LinearRegression
+import folium
+from streamlit_folium import folium_static
 
 @st.cache
 def load_data(file):
@@ -54,6 +56,24 @@ def plot_seasonal_profiles(data, city):
     ax.set_ylabel('Температура (°C)')
     st.pyplot(fig)
 
+def show_map(city, current_temp):
+    city_coords = {
+        "Москва": [55.7558, 37.6176],
+        "Берлин": [52.5200, 13.4050],
+        "Пекин": [39.9042, 116.4074],
+        "Дубай": [25.276987, 55.296249],
+        "Каир": [30.0444, 31.2357]
+    }
+    
+    map = folium.Map(location=city_coords[city], zoom_start=10)
+    folium.Marker(
+        location=city_coords[city],
+        popup=f"Текущая температура: {current_temp}°C",
+        icon=folium.Icon(color='red')
+    ).add_to(map)
+    
+    folium_static(map)
+
 def main():
     st.title("Анализ температурных данных и мониторинг текущей температуры")
     
@@ -79,11 +99,15 @@ def main():
         plot_seasonal_profiles(city_data, selected_city)
         
         st.subheader("Мониторинг текущей температуры")
-        api_key = st.text_input("a1a99bc4a02d8ed0bd43326f6954c7aa", type="password")
+        api_key = st.text_input("Введите ваш API ключ OpenWeatherMap", type="password")
         if api_key:
             current_temp = get_current_temperature(api_key, selected_city)
             if current_temp is not None:
                 st.write(f"Текущая температура в городе {selected_city}: {current_temp}°C")
+                
+                st.subheader("Интерактивная карта")
+                show_map(selected_city, current_temp)
+                
                 current_season = city_data[city_data['timestamp'].dt.month == datetime.now().month]['season'].mode()[0]
                 season_data = city_data[city_data['season'] == current_season]
                 avg_temp = season_data['temperature'].mean()
