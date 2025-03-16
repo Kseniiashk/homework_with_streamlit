@@ -56,6 +56,16 @@ def plot_seasonal_profiles(data, city):
     ax.set_ylabel('Температура (°C)')
     st.pyplot(fig)
 
+def get_city_coords(api_key, city):
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return [data['coord']['lat'], data['coord']['lon']]
+    else:
+        st.error(f"Не удалось получить координаты для города {city}.")
+        return None
+        
 def show_map(city, current_temp, api_key):
     coords = get_city_coords(api_key, city)
     if coords:
