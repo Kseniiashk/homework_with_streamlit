@@ -56,23 +56,18 @@ def plot_seasonal_profiles(data, city):
     ax.set_ylabel('Температура (°C)')
     st.pyplot(fig)
 
-def show_map(city, current_temp):
-    city_coords = {
-        "Москва": [55.7558, 37.6176],
-        "Берлин": [52.5200, 13.4050],
-        "Пекин": [39.9042, 116.4074],
-        "Дубай": [25.276987, 55.296249],
-        "Каир": [30.0444, 31.2357]
-    }
-    
-    map = folium.Map(location=city_coords[city], zoom_start=10)
-    folium.Marker(
-        location=city_coords[city],
-        popup=f"Текущая температура: {current_temp}°C",
-        icon=folium.Icon(color='red')
-    ).add_to(map)
-    
-    folium_static(map)
+def show_map(city, current_temp, api_key):
+    coords = get_city_coords(api_key, city)
+    if coords:
+        map = folium.Map(location=coords, zoom_start=10)
+        folium.Marker(
+            location=coords,
+            popup=f"Текущая температура: {current_temp}°C",
+            icon=folium.Icon(color='red')
+        ).add_to(map)
+        folium_static(map)
+    else:
+        st.warning(f"Не удалось найти координаты для города {city}.")
 
 def main():
     st.title("Анализ температурных данных и мониторинг текущей температуры")
@@ -106,7 +101,7 @@ def main():
                 st.write(f"Текущая температура в городе {selected_city}: {current_temp}°C")
                 
                 st.subheader("Интерактивная карта")
-                show_map(selected_city, current_temp)
+                show_map(selected_city, current_temp, api_key)
                 
                 current_season = city_data[city_data['timestamp'].dt.month == datetime.now().month]['season'].mode()[0]
                 season_data = city_data[city_data['season'] == current_season]
