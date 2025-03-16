@@ -6,3 +6,4 @@ scikit-learn
 requests
 folium==0.14.0
 streamlit-folium==0.11.1
+fpdf==1.7.2
