@@ -82,21 +82,17 @@ def show_map(city, current_temp, api_key):
 def main():
     st.title("Анализ температурных данных и мониторинг текущей температуры")
     
-    uploaded_file = st.file_uploader("Загрузите файл с историческими данными о температуре", type=["csv"])
+    uploaded_file = st.file_uploader("Загрузите файл с данными о температуре", type=["csv"])
     if uploaded_file is not None:
         data = load_data(uploaded_file)
-        
         cities = data['city'].unique()
         selected_city = st.selectbox("Выберите город", cities)
-        
         city_data = data[data['city'] == selected_city]
-        
         city_data = calculate_moving_average(city_data)
         city_data = detect_anomalies(city_data)
         
         st.subheader("Описательная статистика")
         st.write(city_data.describe())
-        
         st.subheader("Временной ряд температуры с аномалиями")
         plot_time_series(city_data, selected_city)
         
@@ -118,7 +114,7 @@ def main():
                 avg_temp = season_data['temperature'].mean()
                 std_temp = season_data['temperature'].std()
                 
-                if avg_temp - 2 * std_temp <= current_temp <= avg_temp + 2 * std_temp:
+                if avg_temp - 2 * std_temp <= current_temp and current_temp <= avg_temp + 2 * std_temp:
                     st.write("Текущая температура находится в пределах нормы.")
                 else:
                     st.write("Текущая температура является аномальной.")
