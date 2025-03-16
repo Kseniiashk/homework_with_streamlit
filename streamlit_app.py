@@ -57,7 +57,7 @@ def create_plot_time_series(data, city):
     st.plotly_chart(fig)
     return fig
 
-def create_plot_seasonal_profiles(city):
+def create_plot_seasonal_profiles(data, city):
     seasons = ["winter", "spring", "summer", "autumn"]
     temperatures =  data.groupby('season')['temperature'].mean()
     
@@ -124,7 +124,7 @@ def create_pdf_report(city, data, current_temp, api_key):
     pdf.image("time_series.png", x=10, y=pdf.get_y(), w=180)
     pdf.ln(100)
     
-    seasonal_fig = create_plot_seasonal_profiles(city)
+    seasonal_fig = create_plot_seasonal_profiles(data, city)
     seasonal_fig.write_image("seasonal_profiles.png")
     pdf.image("seasonal_profiles.png", x=10, y=pdf.get_y(), w=180)
     pdf.ln(100)
