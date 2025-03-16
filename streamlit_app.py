@@ -12,24 +12,6 @@ import base64
 import plotly.express as px
 import kaleido
 
-city_seasonal_data = {
-    "New York": {"winter": 0, "spring": 10, "summer": 25, "autumn": 15},
-    "London": {"winter": 5, "spring": 11, "summer": 18, "autumn": 12},
-    "Paris": {"winter": 4, "spring": 12, "summer": 20, "autumn": 13},
-    "Tokyo": {"winter": 6, "spring": 15, "summer": 27, "autumn": 18},
-    "Moscow": {"winter": -10, "spring": 5, "summer": 18, "autumn": 8},
-    "Sydney": {"winter": 12, "spring": 18, "summer": 25, "autumn": 20},
-    "Berlin": {"winter": 0, "spring": 10, "summer": 20, "autumn": 11},
-    "Beijing": {"winter": -2, "spring": 13, "summer": 27, "autumn": 16},
-    "Rio de Janeiro": {"winter": 20, "spring": 25, "summer": 30, "autumn": 25},
-    "Dubai": {"winter": 20, "spring": 30, "summer": 40, "autumn": 30},
-    "Los Angeles": {"winter": 15, "spring": 18, "summer": 25, "autumn": 20},
-    "Singapore": {"winter": 27, "spring": 28, "summer": 28, "autumn": 27},
-    "Mumbai": {"winter": 25, "spring": 30, "summer": 35, "autumn": 30},
-    "Cairo": {"winter": 15, "spring": 25, "summer": 35, "autumn": 25},
-    "Mexico City": {"winter": 12, "spring": 18, "summer": 20, "autumn": 15},
-}
-
 @st.cache
 def load_data(file):
     data = pd.read_csv(file)
@@ -135,11 +117,6 @@ def create_pdf_report(city, data, current_temp, api_key):
     pdf.ln(10)
     
     pdf.cell(200, 10, txt=f"Текущая температура: {current_temp}°C", ln=True)
-    pdf.ln(10)
-    
-    current_season = data[data['timestamp'].dt.month == datetime.now().month]['season'].mode()[0]
-    avg_temp = city_seasonal_data[city][current_season]
-    pdf.cell(200, 10, txt=f"Средняя температура для текущего сезона ({current_season}): {avg_temp}°C", ln=True)
     pdf.ln(10)
     
     time_series_fig = create_plot_time_series(data, city)
