@@ -104,11 +104,13 @@ def show_map(city, current_temp, api_key):
 def create_pdf_report(city, data, current_temp, api_key):
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    
+    pdf.add_font('DejaVuSans', '', 'DejaVuSans.ttf', uni=True)
+    pdf.set_font('DejaVuSans', '', 12)
     
     pdf.cell(200, 10, txt=f"Отчет по температуре в городе {city}", ln=True, align='C')
     pdf.ln(10)
-
+    
     pdf.set_font('DejaVuSans', '', 10)
     pdf.cell(200, 10, txt="Описательная статистика:", ln=True)
     pdf.ln(5)
