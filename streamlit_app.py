@@ -109,11 +109,11 @@ def create_pdf_report(city, data, current_temp, api_key):
     pdf.cell(200, 10, txt=f"Отчет по температуре в городе {city}", ln=True, align='C')
     pdf.ln(10)
 
-    pdf.set_font("Arial", size=10)
+    pdf.set_font('DejaVuSans', '', 10)
     pdf.cell(200, 10, txt="Описательная статистика:", ln=True)
     pdf.ln(5)
     stats = data.describe().to_string()
-    pdf.multi_cell(0, 10, txt=stats)
+    pdf.multi_cell(0, 10, txt=stats.encode('latin1', 'replace').decode('latin1'))
     pdf.ln(10)
     
     pdf.cell(200, 10, txt=f"Текущая температура: {current_temp}°C", ln=True)
