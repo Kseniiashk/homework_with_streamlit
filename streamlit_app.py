@@ -56,6 +56,14 @@ def plot_seasonal_profiles(data, city):
     ax.set_ylabel('Температура (°C)')
     st.pyplot(fig)
 
+def plot_correlation(data):
+    numeric_data = data[['temperature', 'humidity', 'pressure', 'wind_speed']]
+    corr = numeric_data.corr()
+    fig, ax = plt.subplots()
+    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax)
+    ax.set_title('Тепловая карта корреляции')
+    st.pyplot(fig)
+
 def get_city_coords(api_key, city):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
     response = requests.get(url)
@@ -99,6 +107,12 @@ def main():
         
         st.subheader("Сезонные профили температуры")
         plot_seasonal_profiles(city_data, selected_city)
+
+        st.subheader("Анализ корреляции между параметрами")
+        if all(col in city_data.columns for col in ['temperature', 'humidity', 'pressure', 'wind_speed']):
+            plot_correlation(city_data)
+        else:
+            st.warning("В данных отсутствуют необходимые колонки для анализа корреляции.")
         
         st.subheader("Мониторинг текущей температуры")
         api_key = st.text_input("Введите ваш API ключ OpenWeatherMap", type="password")
