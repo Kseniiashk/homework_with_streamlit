@@ -7,6 +7,8 @@ from datetime import datetime
 from sklearn.linear_model import LinearRegression
 import folium
 from streamlit_folium import folium_static
+from fpdf import FPDF
+import base64
 
 @st.cache
 def load_data(file):
@@ -79,6 +81,42 @@ def show_map(city, current_temp, api_key):
     else:
         st.warning(f"Не удалось найти координаты для города {city}.")
 
+
+def create_pdf_report(city, data, current_temp, api_key):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    pdf.cell(200, 10, txt=f"Отчет по температуре в городе {city}", ln=True, align='C')
+    pdf.ln(10)
+
+    pdf.set_font("Arial", size=10)
+    pdf.cell(200, 10, txt="Описательная статистика:", ln=True)
+    pdf.ln(5)
+    stats = data.describe().to_string()
+    pdf.multi_cell(0, 10, txt=stats)
+    pdf.ln(10)
+    
+    pdf.cell(200, 10, txt=f"Текущая температура: {current_temp}°C", ln=True)
+    pdf.ln(10)
+    
+    current_season = data[data['timestamp'].dt.month == datetime.now().month]['season'].mode()[0]
+    avg_temp = city_seasonal_data[city][current_season]
+    pdf.cell(200, 10, txt=f"Средняя температура для текущего сезона ({current_season}): {avg_temp}°C", ln=True)
+    pdf.ln(10)
+    
+    time_series_fig = plot_time_series(data, city)
+    time_series_fig.write_image("time_series.png")
+    pdf.image("time_series.png", x=10, y=pdf.get_y(), w=180)
+    pdf.ln(100)
+    
+    seasonal_fig = plot_seasonal_profiles(city)
+    seasonal_fig.write_image("seasonal_profiles.png")
+    pdf.image("seasonal_profiles.png", x=10, y=pdf.get_y(), w=180)
+    pdf.ln(100)
+    pdf.output(f"{city}_temperature_report.pdf")
+    return f"{city}_temperature_report.pdf"
+
 def main():
     st.title("Анализ температурных данных и мониторинг текущей температуры")
     
@@ -119,6 +157,12 @@ def main():
                     st.write("Текущая температура находится в пределах нормы.")
                 else:
                     st.write("Текущая температура является аномальной.")
+
+                st.subheader("Скачать отчет")
+                if st.button("Создать PDF-отчет"):
+                    report_path = create_pdf_report(selected_city, city_data, current_temp, api_key)
+                    st.markdown(get_binary_file_downloader_html(report_path), unsafe_allow_html=True)
+                    
             else:
                 st.error("Не удалось получить текущую температуру.")
         else:
