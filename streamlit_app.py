@@ -65,6 +65,23 @@ def plot_time_series(data, city):
     ax.legend()
     st.pyplot(fig)
 
+def create_plot_time_series(data, city):
+    fig = px.line(data, x='timestamp', y='temperature', title=f'Температура в городе {city}')
+    anomalies = data[data['anomaly'] == 1]
+    fig.add_scatter(x=anomalies['timestamp'], y=anomalies['temperature'], mode='markers',
+                    marker=dict(color='red', size=10), name='Аномалии')
+    st.plotly_chart(fig)
+    return fig
+
+def create_plot_seasonal_profiles(city):
+    seasons = ["winter", "spring", "summer", "autumn"]
+    temperatures = [city_seasonal_data[city][season] for season in seasons]
+    
+    fig = px.bar(x=seasons, y=temperatures, labels={'x': 'Сезон', 'y': 'Температура (°C)'},
+                 title=f'Сезонные профили температуры в городе {city}')
+    st.plotly_chart(fig)
+    return fig
+    
 def plot_seasonal_profiles(data, city):
     seasonal_avg = data.groupby('season')['temperature'].mean()
     seasonal_std = data.groupby('season')['temperature'].std()
@@ -123,12 +140,12 @@ def create_pdf_report(city, data, current_temp, api_key):
     pdf.cell(200, 10, txt=f"Средняя температура для текущего сезона ({current_season}): {avg_temp}°C", ln=True)
     pdf.ln(10)
     
-    time_series_fig = plot_time_series(data, city)
+    time_series_fig = create_plot_time_series(data, city)
     time_series_fig.write_image("time_series.png")
     pdf.image("time_series.png", x=10, y=pdf.get_y(), w=180)
     pdf.ln(100)
     
-    seasonal_fig = plot_seasonal_profiles(city)
+    seasonal_fig = create_plot_seasonal_profiles(city)
     seasonal_fig.write_image("seasonal_profiles.png")
     pdf.image("seasonal_profiles.png", x=10, y=pdf.get_y(), w=180)
     pdf.ln(100)
