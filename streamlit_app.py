@@ -10,6 +10,7 @@ from streamlit_folium import folium_static
 from fpdf import FPDF
 import base64
 import plotly.express as px
+import kaleido
 
 city_seasonal_data = {
     "New York": {"winter": 0, "spring": 10, "summer": 25, "autumn": 15},
