@@ -59,7 +59,7 @@ def create_plot_time_series(data, city):
 
 def create_plot_seasonal_profiles(city):
     seasons = ["winter", "spring", "summer", "autumn"]
-    temperatures = [city_seasonal_data[city][season] for season in seasons]
+    temperatures =  data.groupby('season')['temperature'].mean()
     
     fig = px.bar(x=seasons, y=temperatures, labels={'x': 'Сезон', 'y': 'Температура (°C)'},
                  title=f'Сезонные профили температуры в городе {city}')
